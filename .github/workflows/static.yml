@@ -1,0 +1,210 @@
+<!DOCTYPE html><html lang=”pt-BR”>
+
+<head>
+
+    <meta charset=”UTF-8”>
+
+    <meta name=”viewport” content=”width=device-width, initial-scale=1.0”>
+
+    <title>Contador de Entradas</title>
+
+    <style>
+
+        Body {
+
+            Font-family: Arial, sans-serif;
+
+            Background-color: white;
+
+            Color: black;
+
+            Text-align: center;
+
+            Padding: 50px;
+
+            Border: 2px solid gray;
+
+            Max-width: 400px;
+
+            Margin: auto;
+
+        }
+
+        #contador {
+
+            Font-size: 24px;
+
+            Margin: 20px 0;
+
+        }
+
+        Button {
+
+            Font-size: 18px;
+
+            Padding: 10px;
+
+            Cursor: pointer;
+
+            Margin: 5px;
+
+        }
+
+        #historico {
+
+            Margin-top: 20px;
+
+            Text-align: left;
+
+            Border-top: 1px solid gray;
+
+            Padding-top: 10px;
+
+        }
+
+        Table {
+
+            Width: 100%;
+
+            Border-collapse: collapse;
+
+            Margin-top: 10px;
+
+        }
+
+        Th, td {
+
+            Border: 1px solid gray;
+
+            Padding: 8px;
+
+            Text-align: center;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Quantas vezes Patrick entrou na sala:</h1>
+
+    <button onclick=”registrarEntrada()”>Entrou</button><div id=”historico”>
+
+    <h2>Relatório de Entradas:</h2>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>#</th>
+
+                <th>Data e Hora</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id=”tabelaEntradas”></tbody>
+
+    </table>
+
+</div>
+
+
+
+<script>
+
+    Async function obterHorarioMarica() {
+
+        Try {
+
+            Const response = await fetch(‘http://worldtimeapi.org/api/timezone/America/São_Paulo’);
+
+            Const data = await response.json();
+
+            Return new Date(data.datetime).toLocaleString(‘pt-BR’);
+
+        } catch (error) {
+
+            Console.error(‘Erro ao obter horário:’, error);
+
+            Return new Date().toLocaleString(‘pt-BR’);
+
+        }
+
+    }
+
+
+
+    Async function registrarEntrada() {
+
+        Const horario = await obterHorarioMarica();
+
+        
+
+        Const response = await fetch(‘/registrar’, {
+
+            Method: ‘POST’,
+
+            Headers: { ‘Content-Type’: ‘application/json’ },
+
+            Body: JSON.stringify({ horario })
+
+        });
+
+        
+
+        If (response.ok) {
+
+            carregarEntradas();
+
+        }
+
+    }
+
+
+
+    Async function carregarEntradas() {
+
+        Const response = await fetch(‘/entradas’);
+
+        Const entradas = await response.json();
+
+        
+
+        Const tabela = document.getElementById(‘tabelaEntradas’);
+
+        Tabela.innerHTML = ‘’;
+
+        
+
+        Entradas.forEach((entrada, index) => {
+
+            Const row = document.createElement(‘tr’);
+
+            Row.innerHTML = `<td>${index + 1}</td><td>${entrada.horario}</td>`;
+
+            Tabela.appendChild(row);
+
+        });
+
+    }
+
+
+
+    Window.onload = carregarEntradas;
+
+</script>
+
+
+
+</body>
+
+</html>
+
+
+
